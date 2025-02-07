@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحليل الاتجاه المالي</title>
+    <style>
+        body { font-family: Arial, sans-serif; direction: rtl; text-align: right; }
+        .container { width: 50%; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table, th, td { border: 1px solid black; text-align: center; }
+        th, td { padding: 8px; }
+        img { width: 100%; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>تحليل الاتجاه المالي</h2>
+        <form method="post">
+            <label for="periods">عدد الفترات:</label>
+            <input type="number" name="periods" id="periods" min="1" max="10" required>
+
+            <label for="time_duration">المدة الزمنية:</label>
+            <input type="number" name="time_duration" id="time_duration" min="1" required>
+            <select name="time_unit" id="time_unit">
+                <option value="دقيقة">دقيقة</option>
+                <option value="ساعة">ساعة</option>
+            </select>
+
+            <div id="inputs"></div>
+            <button type="submit">تحليل البيانات</button>
+        </form>
+        
+        {% if tables %}
+            <h3>نتائج التحليل</h3>
+            {{ tables[0]|safe }}
+            <h3>الرسم البياني بالشموع اليابانية</h3>
+            <img src="data:image/png;base64,{{ plot_url }}" alt="الرسم البياني">
+            <h3>التوقعات للفترة القادمة</h3>
+            <p><strong>السعر المتوقع للإغلاق:</strong> {{ predicted_close }}</p>
+            <p><strong>أعلى سعر متوقع:</strong> {{ predicted_high }}</p>
+            <p><strong>أقل سعر متوقع:</strong> {{ predicted_low }}</p>
+        {% endif %}
+    </div>
+    
+    <script>
+        document.getElementById("periods").addEventListener("change", function() {
+            let periods = this.value;
+            let inputsDiv = document.getElementById("inputs");
+            inputsDiv.innerHTML = "";
+            for (let i = 0; i < periods; i++) {
+                inputsDiv.innerHTML += `
+                    <h4>الفترة ${i + 1}</h4>
+                    <label>سعر الفتح:</label>
+                    <input type="number" step="0.0001" name="open_price_${i}" required><br>
+                    <label>أعلى سعر:</label>
+                    <input type="number" step="0.0001" name="high_price_${i}" required><br>
+                    <label>أقل سعر:</label>
+                    <input type="number" step="0.0001" name="low_price_${i}" required><br>
+                    <label>سعر الإغلاق:</label>
+                    <input type="number" step="0.0001" name="close_price_${i}" required><br>
+                    <hr>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
